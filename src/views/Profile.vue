@@ -2,8 +2,7 @@
   <div class="main-container">
     <div class="jumbotron jumbotron-fluid">
       <div class="container">
-        <h1 class="display-3">Bienvenue, {{ username }}</h1>
-        <p class="lead">Regardez toutes les images tendances !</p>
+        <h1 class="display-3">Mon profil</h1>
       </div>
     </div>
     <div class="container mt-3">
@@ -14,8 +13,8 @@
             :key="result.id"
             :id="result.id"
             :title="result.title"
-            :img_src="result.image.link"
-            :condition="result.image.type === 'video/mp4'"
+            :img_src="result.link"
+            :condition="result.type === 'video/mp4'"
           ></Card>
         </div>
         <div class="d-flex flex-column col-md-4">
@@ -24,8 +23,8 @@
             :key="result.id"
             :id="result.id"
             :title="result.title"
-            :img_src="result.image.link"
-            :condition="result.image.type === 'video/mp4'"
+            :img_src="result.link"
+            :condition="result.type === 'video/mp4'"
           ></Card>
         </div>
         <div class="d-flex flex-column col-md-4">
@@ -34,8 +33,8 @@
             :key="result.id"
             :id="result.id"
             :title="result.title"
-            :img_src="result.image.link"
-            :condition="result.image.type === 'video/mp4'"
+            :img_src="result.link"
+            :condition="result.type === 'video/mp4'"
           ></Card>
         </div>
       </div>
@@ -67,10 +66,7 @@ export default {
     async loadImages () {
       const config = {
         method: 'get',
-        url: 'https://api.imgur.com/3/gallery/hot/viral/?showViral=true&mature=false',
-        headers: {
-          Authorization: 'Client-ID 802a829ba01986a'
-        }
+        url: 'https://api.imgur.com/3/account/' + this.username + '/favorites/'
       }
 
       await this.$http(config)
@@ -84,13 +80,39 @@ export default {
   },
   async mounted () {
     await this.loadImages()
+
     let i = 1
+
     this.results.forEach(result => {
-      if (result.images) {
-        result.image = result.images[0]
-      } else {
-        result.image = { link: result.link, type: result.type }
+      let ext = ''
+
+      switch (result.type) {
+        case 'image/jpeg':
+          ext = 'jpeg'
+          break
+
+        case 'image/jpg':
+          ext = 'jpg'
+          break
+
+        case 'image/png':
+          ext = 'png'
+          break
+
+        case 'image/gif':
+          ext = 'gif'
+          break
+
+        case 'video/mp4':
+          ext = 'mp4'
+          break
+
+        default:
+          ext = 'jpg'
+          break
       }
+
+      result.link = 'https://i.imgur.com/' + result.cover + '.' + ext
 
       // Push dans 3 tableaux pour faire bo
       switch (i) {
